@@ -55,19 +55,29 @@ void drawMap2D(void)
     }
 }
 
+//Using DDA algorithm
 void drawRays2D(void)
 {
-    int mx, my , mapPos, depthOfField = 0;
+
+    //mx and my are for the map tile positions
+    //depthOfField is so that we aren't checking for intersections beyond map bounds
+    int mx, my , depthOfField = 0;
+    //rayX and rayY make the position that it is currently looking at
+    //offsetX and offsetY is the distance to the next intersection
     float rayX, rayY, rayAngle, offsetX, offsetY = 0.0;
     //Lining up ray angle and player angle
     rayAngle = player.getAngle();
+
     //Loops for casting rays
     for(int i = 0; i < 1; i++)
     {
-
-        float aTan = -1/tan(rayAngle);
-        //Check for horizontal grid line intersections
         depthOfField = 0;
+        float aTan = -1/tan(rayAngle);
+
+        //********************************************
+        //Check for horizontal grid line intersections
+        //********************************************
+
         //If looking down
         if(rayAngle > PI)
         {
@@ -78,7 +88,7 @@ void drawRays2D(void)
             offsetX = -offsetY * aTan;
         }
         //If looking up
-        if(rayAngle < PI)
+        else if(rayAngle < PI)
         {
             //Finds the first point of horizontal grid line intersection
             rayY = (((int)player.getPosY()>>6)<<6) + 64;
@@ -87,12 +97,13 @@ void drawRays2D(void)
             offsetX = -offsetY * aTan;
         }
         //If looking straight left or right
-        if(rayAngle == 0 || rayAngle == PI)
+        else if(rayAngle == 0 || rayAngle == PI)
         {
             rayX = player.getPosX();
             rayY = player.getPosY();
             depthOfField = 8;
         }
+
         while(depthOfField < 8)
         {
             //Calculate the the spot in the map array based on the end point of the ray
@@ -111,6 +122,7 @@ void drawRays2D(void)
                 depthOfField += 1;
             }
         }
+        //Draw the ray
         glColor3f(0, 1, 0);
         glLineWidth(6);
         glBegin(GL_LINES);
@@ -118,14 +130,18 @@ void drawRays2D(void)
         glVertex2i(rayX, rayY);
         glEnd();
 
+        //******************************************
+        //Check for Vertical grid line intersections
+        //******************************************
+
+        //Reset variables because if not it breaks
         int mx, my , mapPos, depthOfField = 0;
         float rayX, rayY, rayAngle, offsetX, offsetY = 0.0;
         //Lining up ray angle and player angle
         rayAngle = player.getAngle();
-
-        //Check for Vertical grid line intersections
         depthOfField = 0;
         float nTan = -tan(rayAngle);
+
         //If looking left
         if((rayAngle > NORTH) && (rayAngle < SOUTH))
         {
@@ -136,7 +152,7 @@ void drawRays2D(void)
             offsetY = -offsetX * nTan;
         }
         //If looking right
-        if(rayAngle < NORTH || rayAngle > SOUTH)
+        else if(rayAngle < NORTH || rayAngle > SOUTH)
         {
             //Finds the first point of horizontal grid line intersection
             rayX = (((int)player.getPosX()>>6)<<6) + 64;
@@ -145,12 +161,13 @@ void drawRays2D(void)
             offsetY = -offsetX * nTan;
         }
         //If looking straight up or down
-        if(rayAngle == NORTH || rayAngle == SOUTH)
+        else if(rayAngle == NORTH || rayAngle == SOUTH)
         {
             rayX = player.getPosX();
             rayY = player.getPosY();
             depthOfField = 8;
         }
+
         while(depthOfField < 8)
         {
             //Calculate the the spot in the map array based on the end point of the ray
@@ -168,7 +185,7 @@ void drawRays2D(void)
                 depthOfField += 1;
             }
         }
-
+        //Draw the ray
         glColor3f(1, 0, 0);
         glLineWidth(3);
         glBegin(GL_LINES);
@@ -207,7 +224,6 @@ void buttons(unsigned char key, int x, int y)
         }
         player.setDeltaX(cos(player.getAngle()) * MOVEAMOUNT);
         player.setDeltaY(sin(player.getAngle()) * MOVEAMOUNT);
-        //THIS IS WHERE I LEFT OFF
     }
     if(key == 'd')
     {
@@ -260,7 +276,7 @@ int main(int argc, char* argv[])
     //Sets size of the window
     glutInitWindowSize(WIDTH, HEIGHT);
     //Creates a top level window
-    glutCreateWindow("Raycasting Project");
+    glutCreateWindow("Raycasting-Project");
     init();
     //Redraws window when it is resized/moved/hidden
     glutDisplayFunc(display);
