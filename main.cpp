@@ -195,6 +195,97 @@ void drawRays2D(void)
         }
 }
 
+//Uses DDA algorithm
+void myDrawRays2D(void)
+{
+    //Initial starting info
+    int x1 = player.getPosX();
+    int y1 = player.getPosY();
+    float rayAngle = player.getAngle();
+
+    for(int i = 0; i < 1; i++)
+    {
+        //***************************
+        //Checking for vertical lines
+        //***************************
+
+        //Checking for first vertical line intersections
+        int rayXVert = 0;
+        int rayYVert = 0;
+        float slopeVert = 0;
+
+        //Looking to the right
+        if((rayAngle < PI / 2) || (rayAngle > 1.5 * PI))
+        {
+            rayXVert = x1 + (mapSize - (x1 % mapSize));
+        }
+        //Looking to the left
+        else if((rayAngle > PI / 2) && (rayAngle <= 1.5 * PI))
+        {
+            rayXVert = x1 - (x1 % mapSize);
+        }
+        else
+        {
+            rayXVert = x1;
+        }
+
+
+        rayYVert = y1 + tan(rayAngle) * (rayXVert - x1);
+        slopeVert = (rayYVert - y1) / (rayXVert - x1);
+
+        //Draw the ray
+        glColor3f(0, 1, 0);
+        glLineWidth(6);
+        glBegin(GL_LINES);
+        glVertex2i(player.getPosX(), player.getPosY());
+        glVertex2i(rayXVert, rayYVert);
+        glEnd();
+
+        //*****************************
+        //Checking for horizontal lines
+        //*****************************
+
+        //Checking for first horizontal line intersections
+        int rayXHori = 0;
+        int rayYHori = 0;
+        float slopeHori = 0;
+
+        //Looking up
+        if(rayAngle > 0 && rayAngle < PI)
+        {
+            rayYHori = y1 + (mapSize - (y1 % mapSize));
+        }
+        //Looking down
+        else if(rayAngle > PI)
+        {
+            rayYHori = y1 - (y1 % mapSize);
+        }
+        else
+        {
+            rayYHori = y1;
+        }
+
+        rayXHori = x1 +  ((rayYHori - y1) / tan(rayAngle));
+        slopeHori = (rayYHori - y1) / (rayXHori - x1);
+
+
+
+        //Draw the ray
+        glColor3f(1, 0, 0);
+        glLineWidth(3);
+        glBegin(GL_LINES);
+        glVertex2i(player.getPosX(), player.getPosY());
+        glVertex2i(rayXHori, rayYHori);
+        glEnd();
+
+
+    }
+
+
+
+
+}
+
 
 static void display(void)
 {
@@ -203,7 +294,8 @@ static void display(void)
     //Draw the map
     drawMap2D();
     //Draw the rays
-    drawRays2D();
+    //drawRays2D();
+    myDrawRays2D();
     //Draw the player
     player.draw();
     //Swaps frame buffers
