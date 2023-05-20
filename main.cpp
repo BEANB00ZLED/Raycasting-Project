@@ -25,6 +25,11 @@ int map[8][8] =
     {1,1,1,1,1,1,1,1}
 };
 
+int pixelToTile(int num)
+{
+    return int(num / 64);
+}
+
 void drawMap2D(void)
 {
     int coordX, coordY, baseX, baseY = 0;
@@ -205,39 +210,66 @@ void myDrawRays2D(void)
 
     for(int i = 0; i < 1; i++)
     {
+        int depthOfField = 0;
+
         //***************************
         //Checking for vertical lines
         //***************************
 
         //Checking for first vertical line intersections
-        int rayXVert = 0;
-        int rayYVert = 0;
-        float slopeVert = 0;
+        float rayXVert = 0.0;
+        float rayYVert = 0.0;
+        float deltaY = 0.0;
+        int directionX = 0;
 
         //Looking to the right
         if((rayAngle < PI / 2) || (rayAngle > 1.5 * PI))
         {
             rayXVert = x1 + (mapSize - (x1 % mapSize));
+            directionX = 1;
         }
         //Looking to the left
         else if((rayAngle > PI / 2) && (rayAngle <= 1.5 * PI))
         {
             rayXVert = x1 - (x1 % mapSize);
+            directionX = -1;
         }
         else
         {
             rayXVert = x1;
+            depthOfField = 8;
+            directionX = 0;
         }
-
-
+        //Finish calculating first point of intersection
         rayYVert = y1 + tan(rayAngle) * (rayXVert - x1);
-        slopeVert = (rayYVert - y1) / (rayXVert - x1);
+
+        //Calculate the slope
+        deltaY = tan(rayAngle) * (64 * directionX);
+
+
+        //Loop to extend ray until it hits a wall
+        while(depthOfField < 8)
+        {
+            //The .001 is so that it will round correctly while looking either way
+            int tileX = pixelToTile(rayXVert + (.001 * directionX));
+            int tileY = pixelToTile(rayYVert);
+            if(map[tileY][tileX] == 1)
+            {
+                depthOfField = 8;
+            }
+            else
+            {
+                rayYVert += deltaY;
+                rayXVert += 64 * directionX;
+                depthOfField++;
+            }
+        }
 
         //Draw the ray
         glColor3f(0, 1, 0);
-        glLineWidth(6);
+        glLineWidth(3);
         glBegin(GL_LINES);
-        glVertex2i(player.getPosX(), player.getPosY());
+        glVertex2i(x1, y1);
         glVertex2i(rayXVert, rayYVert);
         glEnd();
 
@@ -245,45 +277,66 @@ void myDrawRays2D(void)
         //Checking for horizontal lines
         //*****************************
 
+        depthOfField = 0;
+        rayAngle = player.getAngle();
+
         //Checking for first horizontal line intersections
-        int rayXHori = 0;
-        int rayYHori = 0;
-        float slopeHori = 0;
+        float rayXHori = 0.0;
+        float rayYHori = 0.0;
+        float deltaX = 0.0;
+        int directionY = 0;
 
         //Looking up
         if(rayAngle > 0 && rayAngle < PI)
         {
             rayYHori = y1 + (mapSize - (y1 % mapSize));
+            directionY = 1;
         }
         //Looking down
         else if(rayAngle > PI)
         {
             rayYHori = y1 - (y1 % mapSize);
+            directionY = -1;
         }
         else
         {
             rayYHori = y1;
+            depthOfField = 8;
+            directionY = 0;
         }
-
+        //Finish calculating the first point of intersection
         rayXHori = x1 +  ((rayYHori - y1) / tan(rayAngle));
-        slopeHori = (rayYHori - y1) / (rayXHori - x1);
 
+        //Calculate the slope
+        deltaX = ((64 * directionY) / tan(rayAngle));
 
+        while(depthOfField < 8)
+
+        {
+            //The .001 is so that it will round correctly while looking either way
+            int tileX = pixelToTile(rayXHori);
+            int tileY = pixelToTile(rayYHori  + (.001 * directionY));
+
+            if(map[tileY][tileX] == 1)
+            {
+                depthOfField = 8;
+            }
+            else
+            {
+                rayYHori += 64 * directionY;
+                rayXHori += deltaX;
+                depthOfField++;
+            }
+        }
 
         //Draw the ray
         glColor3f(1, 0, 0);
         glLineWidth(3);
         glBegin(GL_LINES);
-        glVertex2i(player.getPosX(), player.getPosY());
+        glVertex2i(x1, y1);
         glVertex2i(rayXHori, rayYHori);
         glEnd();
-
-
     }
-
-
-
-
 }
 
 
