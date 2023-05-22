@@ -12,5 +12,8 @@ const float NORTH = PI/2;
 const float SOUTH = (3 * PI)/2;
 const float RADDEG = PI / 180; //One degree in radians
 const int NUMRAYS = 60;
+const int WINDOWHEIGHT = 320;
+const int WINDOWWIDTH = 160;
+const int COLUMNWIDTH = 8;
 
 #endif // CONSTANTS_H_INCLUDED

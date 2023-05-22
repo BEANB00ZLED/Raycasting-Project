@@ -65,6 +65,7 @@ void drawRays2D(void)
     int x1 = player.getPosX();
     int y1 = player.getPosY();
     float rayAngle = player.getAngle();
+    float endDist = 0.0;
 
     //For casting multiple rays
     rayAngle -= RADDEG * (NUMRAYS / 2.0);
@@ -189,21 +190,58 @@ void drawRays2D(void)
             }
         }
 
-
-
         //Draw the shorter ray
-        glColor3f(1, 0, 0);
         glLineWidth(3);
         glBegin(GL_LINES);
-        glVertex2i(x1, y1);
         if(dist(x1, y1, rayXHori, rayYHori) <= dist(x1, y1, rayXVert, rayYVert))
         {
+            //If horizontal intersection first
+            glColor3f(0.6, 0, 0);
+            glVertex2i(x1, y1);
             glVertex2i(rayXHori, rayYHori);
+            endDist = dist(x1, y1, rayXHori, rayYHori);
         }
         else
         {
+            //If vertical intersection first
+            glColor3f(0.9, 0, 0);
+            glVertex2i(x1, y1);
             glVertex2i(rayXVert, rayYVert);
+            endDist = dist(x1, y1, rayXVert, rayYVert);
         }
+        glEnd();
+
+        //*****************
+        //Draw the 3D Walls
+        //*****************
+
+        //Fixes the fish eye effect
+        float deltaAngle = player.getAngle() - rayAngle;
+        if(deltaAngle < 0)
+        {
+            deltaAngle += 2 * PI;
+        }
+        else if(deltaAngle > 2 * PI)
+        {
+            deltaAngle -= 2 * PI;
+        }
+        endDist = endDist * cos(deltaAngle);
+
+        //Determine the height of the line(wall)
+        float lineHeight = (mapSize * 320.0) / endDist;
+        if(lineHeight > 320)
+        {
+            lineHeight = 320;
+        }
+        //Play around with the first number to adjust where it is on the screen
+        //adjusting the rest of the formula will shift the perspective
+        float lineOffset = -50 + (WINDOWHEIGHT - lineHeight / 2); //Shift lines downward so they are more centered on screen
+
+        //Drawing the lines for the walls
+        glLineWidth(COLUMNWIDTH);
+        glBegin(GL_LINES);
+        glVertex2i((i * COLUMNWIDTH) + 530, lineOffset);
+        glVertex2i((i * COLUMNWIDTH) + 530, lineHeight + lineOffset);
         glEnd();
 
         //Increment the ray angle so that the next ray can be cast
