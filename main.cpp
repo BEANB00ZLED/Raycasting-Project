@@ -150,13 +150,13 @@ void drawRays2D(void)
         if(rayAngle > 0 && rayAngle < PI)
         {
             rayYHori = y1 + (mapSize - (y1 % mapSize));
-            directionY = -1;
+            directionY = 1;
         }
         //Looking down
         else if(rayAngle > PI)
         {
             rayYHori = y1 - (y1 % mapSize);
-            directionY = 1;
+            directionY = -1;
         }
         else
         {
@@ -169,7 +169,6 @@ void drawRays2D(void)
 
         //Calculate the slope
         deltaX = ((64 * directionY) / tan(rayAngle));
-
 
         while(depthOfField < 8)
 
@@ -190,7 +189,7 @@ void drawRays2D(void)
             }
         }
 
-        /*
+
 
         //Draw the shorter ray
         glColor3f(1, 0, 0);
@@ -205,14 +204,6 @@ void drawRays2D(void)
         {
             glVertex2i(rayXVert, rayYVert);
         }
-        glEnd();
-        */
-
-        glColor3f(1, 0, 0);
-        glLineWidth(3);
-        glBegin(GL_LINES);
-        glVertex2i(x1, y1);
-        glVertex2i(rayXHori, rayYHori);
         glEnd();
 
         //Increment the ray angle so that the next ray can be cast

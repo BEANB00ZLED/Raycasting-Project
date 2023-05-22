@@ -11,6 +11,6 @@ const float LINEWIDTH = 3.0;
 const float NORTH = PI/2;
 const float SOUTH = (3 * PI)/2;
 const float RADDEG = PI / 180; //One degree in radians
-const int NUMRAYS = 20;
+const int NUMRAYS = 60;
 
 #endif // CONSTANTS_H_INCLUDED
