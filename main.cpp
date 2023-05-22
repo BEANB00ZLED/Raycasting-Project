@@ -68,17 +68,17 @@ void drawRays2D(void)
 
     //For casting multiple rays
     rayAngle -= RADDEG * (NUMRAYS / 2.0);
-    if(rayAngle < 0)
-    {
-        rayAngle += 2 * PI;
-    }
-    else if(rayAngle > 2 * PI)
-    {
-        rayAngle -= 2 * PI;
-    }
 
     for(int i = 0; i < NUMRAYS; i++)
     {
+        if(rayAngle < 0)
+        {
+            rayAngle += 2 * PI;
+        }
+        else if(rayAngle > 2 * PI)
+        {
+            rayAngle -= 2 * PI;
+        }
         int depthOfField = 0;
 
         //***************************
@@ -150,17 +150,17 @@ void drawRays2D(void)
         if(rayAngle > 0 && rayAngle < PI)
         {
             rayYHori = y1 + (mapSize - (y1 % mapSize));
-            directionY = 1;
+            directionY = -1;
         }
         //Looking down
         else if(rayAngle > PI)
         {
             rayYHori = y1 - (y1 % mapSize);
-            directionY = -1;
+            directionY = 1;
         }
         else
         {
-            rayYHori = 0;
+            rayYHori = y1;
             depthOfField = 8;
             directionY = 0;
         }
@@ -190,8 +190,8 @@ void drawRays2D(void)
             }
         }
 
-
         /*
+
         //Draw the shorter ray
         glColor3f(1, 0, 0);
         glLineWidth(3);
