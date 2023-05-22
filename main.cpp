@@ -4,6 +4,7 @@
 #include <cmath>
 #include "PlayerClass.h"
 #include "Constants.h"
+#include "Util.h"
 
 
 using namespace std;
@@ -25,10 +26,6 @@ int map[8][8] =
     {1,1,1,1,1,1,1,1}
 };
 
-int pixelToTile(int num)
-{
-    return int(num / 64);
-}
 
 void drawMap2D(void)
 {
@@ -60,155 +57,27 @@ void drawMap2D(void)
     }
 }
 
-//Using DDA algorithm
-void drawRays2D(void)
-{
-
-    //mx and my are for the map tile positions
-    //depthOfField is so that we aren't checking for intersections beyond map bounds
-    int mx, my , depthOfField = 0;
-    //rayX and rayY make the position that it is currently looking at
-    //offsetX and offsetY is the distance to the next intersection
-    float rayX, rayY, rayAngle, offsetX, offsetY = 0.0;
-    //Lining up ray angle and player angle
-    rayAngle = player.getAngle();
-
-    //Loops for casting rays
-    for(int i = 0; i < 1; i++)
-    {
-        depthOfField = 0;
-        float aTan = -1/tan(rayAngle);
-
-        //********************************************
-        //Check for horizontal grid line intersections
-        //********************************************
-
-        //If looking down
-        if(rayAngle > PI)
-        {
-            //Finds the first point of horizontal grid line intersection
-            rayY = (((int)player.getPosY()>>6)<<6) - 0.0001;
-            rayX = (player.getPosY() - rayY) * aTan+player.getPosX();
-            offsetY -=64;
-            offsetX = -offsetY * aTan;
-        }
-        //If looking up
-        else if(rayAngle < PI)
-        {
-            //Finds the first point of horizontal grid line intersection
-            rayY = (((int)player.getPosY()>>6)<<6) + 64;
-            rayX = (player.getPosY() - rayY) * aTan+player.getPosX();
-            offsetY = 64;
-            offsetX = -offsetY * aTan;
-        }
-        //If looking straight left or right
-        else if(rayAngle == 0 || rayAngle == PI)
-        {
-            rayX = player.getPosX();
-            rayY = player.getPosY();
-            depthOfField = 8;
-        }
-
-        while(depthOfField < 8)
-        {
-            //Calculate the the spot in the map array based on the end point of the ray
-            mx = (int)rayX >> 6;
-            my = (int)rayY >> 6;
-            //Makes sure the value is withing map bounds and is wall
-            if((mx >= 0) && (mx < 8) && (my >= 0) && (my < 8) && (map[my][mx] == 1))
-            {
-                depthOfField = 8;
-
-            }
-            else
-            {
-                rayX += offsetX;
-                rayY += offsetY;
-                depthOfField += 1;
-            }
-        }
-        //Draw the ray
-        glColor3f(0, 1, 0);
-        glLineWidth(6);
-        glBegin(GL_LINES);
-        glVertex2i(player.getPosX(), player.getPosY());
-        glVertex2i(rayX, rayY);
-        glEnd();
-
-        //******************************************
-        //Check for Vertical grid line intersections
-        //******************************************
-
-        //Reset variables because if not it breaks
-        int mx, my , mapPos, depthOfField = 0;
-        float rayX, rayY, rayAngle, offsetX, offsetY = 0.0;
-        //Lining up ray angle and player angle
-        rayAngle = player.getAngle();
-        depthOfField = 0;
-        float nTan = -tan(rayAngle);
-
-        //If looking left
-        if((rayAngle > NORTH) && (rayAngle < SOUTH))
-        {
-            //Finds the first point of horizontal grid line intersection
-            rayX = (((int)player.getPosX()>>6)<<6) - 0.0001;
-            rayY = (player.getPosX() - rayX) * nTan + player.getPosY();
-            offsetX -=64;
-            offsetY = -offsetX * nTan;
-        }
-        //If looking right
-        else if(rayAngle < NORTH || rayAngle > SOUTH)
-        {
-            //Finds the first point of horizontal grid line intersection
-            rayX = (((int)player.getPosX()>>6)<<6) + 64;
-            rayY = (player.getPosX() - rayX) * nTan + player.getPosY();
-            offsetX = 64;
-            offsetY = -offsetX * nTan;
-        }
-        //If looking straight up or down
-        else if(rayAngle == NORTH || rayAngle == SOUTH)
-        {
-            rayX = player.getPosX();
-            rayY = player.getPosY();
-            depthOfField = 8;
-        }
-
-        while(depthOfField < 8)
-        {
-            //Calculate the the spot in the map array based on the end point of the ray
-            mx = (int)rayX >> 6;
-            my = (int)rayY >> 6;
-            //Makes sure the value is within map bounds and is wall
-            if((mx >= 0) && (mx < 8) && (my >= 0) && (my < 8) && (map[my][mx] == 1))
-            {
-                depthOfField = 8;
-            }
-            else
-            {
-                rayX += offsetX;
-                rayY += offsetY;
-                depthOfField += 1;
-            }
-        }
-        //Draw the ray
-        glColor3f(1, 0, 0);
-        glLineWidth(3);
-        glBegin(GL_LINES);
-        glVertex2i(player.getPosX(), player.getPosY());
-        glVertex2i(rayX, rayY);
-        glEnd();
-        }
-}
 
 //Uses DDA algorithm
-void myDrawRays2D(void)
+void drawRays2D(void)
 {
     //Initial starting info
     int x1 = player.getPosX();
     int y1 = player.getPosY();
     float rayAngle = player.getAngle();
 
-    for(int i = 0; i < 1; i++)
+    //For casting multiple rays
+    rayAngle -= RADDEG * (NUMRAYS / 2.0);
+    if(rayAngle < 0)
+    {
+        rayAngle += 2 * PI;
+    }
+    else if(rayAngle > 2 * PI)
+    {
+        rayAngle -= 2 * PI;
+    }
+
+    for(int i = 0; i < NUMRAYS; i++)
     {
         int depthOfField = 0;
 
@@ -253,7 +122,7 @@ void myDrawRays2D(void)
             //The .001 is so that it will round correctly while looking either way
             int tileX = pixelToTile(rayXVert + (.001 * directionX));
             int tileY = pixelToTile(rayYVert);
-            if(map[tileY][tileX] == 1)
+            if(tileX < 0 || tileX > 8 || tileY < 0 || tileY > 8 || map[tileY][tileX] == 1)
             {
                 depthOfField = 8;
             }
@@ -265,20 +134,11 @@ void myDrawRays2D(void)
             }
         }
 
-        //Draw the ray
-        glColor3f(0, 1, 0);
-        glLineWidth(3);
-        glBegin(GL_LINES);
-        glVertex2i(x1, y1);
-        glVertex2i(rayXVert, rayYVert);
-        glEnd();
-
         //*****************************
         //Checking for horizontal lines
         //*****************************
 
         depthOfField = 0;
-        rayAngle = player.getAngle();
 
         //Checking for first horizontal line intersections
         float rayXHori = 0.0;
@@ -317,7 +177,7 @@ void myDrawRays2D(void)
             int tileX = pixelToTile(rayXHori);
             int tileY = pixelToTile(rayYHori  + (.001 * directionY));
 
-            if(map[tileY][tileX] == 1)
+            if(tileX < 0 || tileX >= 8 || tileY < 0 || tileY >= 8 || map[tileY][tileX] == 1)
             {
                 depthOfField = 8;
             }
@@ -329,13 +189,24 @@ void myDrawRays2D(void)
             }
         }
 
-        //Draw the ray
+
+        //Draw the shorter ray
         glColor3f(1, 0, 0);
         glLineWidth(3);
         glBegin(GL_LINES);
         glVertex2i(x1, y1);
-        glVertex2i(rayXHori, rayYHori);
+        if(dist(x1, y1, rayXHori, rayYHori) <= dist(x1, y1, rayXVert, rayYVert))
+        {
+            glVertex2i(rayXHori, rayYHori);
+        }
+        else
+        {
+            glVertex2i(rayXVert, rayYVert);
+        }
         glEnd();
+
+        //Increment the ray angle so that the next ray can be cast
+        rayAngle += RADDEG;
     }
 }
 
@@ -347,8 +218,7 @@ static void display(void)
     //Draw the map
     drawMap2D();
     //Draw the rays
-    //drawRays2D();
-    myDrawRays2D();
+    drawRays2D();
     //Draw the player
     player.draw();
     //Swaps frame buffers
@@ -362,22 +232,12 @@ void buttons(unsigned char key, int x, int y)
     if(key == 'a')
     {
         player.setAngle(player.getAngle() - TURNAMOUNT);
-        //In radian circle, go below 0 leads to 2pi
-        if(player.getAngle() < 0)
-        {
-            player.setAngle(player.getAngle() + (2 *  PI));
-        }
         player.setDeltaX(cos(player.getAngle()) * MOVEAMOUNT);
         player.setDeltaY(sin(player.getAngle()) * MOVEAMOUNT);
     }
     if(key == 'd')
     {
         player.setAngle(player.getAngle() + TURNAMOUNT);
-        //In radian circle, go above 2pi leads to 0
-        if(player.getAngle() > (2 * PI))
-        {
-            player.setAngle(player.getAngle() - (2 * PI));
-        }
         player.setDeltaX(cos(player.getAngle()) * MOVEAMOUNT);
         player.setDeltaY(sin(player.getAngle()) * MOVEAMOUNT);
     }

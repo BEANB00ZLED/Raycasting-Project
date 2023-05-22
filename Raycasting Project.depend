@@ -932,20 +932,27 @@
 	"PlayerClass.h"
 	"Constants.h"
 
-1684608197 source:c:\users\anthony altieri\documents\github\raycasting-project\main.cpp
+1684715629 source:c:\users\anthony altieri\documents\github\raycasting-project\main.cpp
 	<iostream>
 	<GL/glut.h>
 	<cmath>
 	"PlayerClass.h"
 	"Constants.h"
+	"Util.h"
 
 1680654952 c:\users\anthony altieri\documents\github\raycasting-project\playerclass.h
 
-1680876672 c:\users\anthony altieri\documents\github\raycasting-project\constants.h
+1684715596 c:\users\anthony altieri\documents\github\raycasting-project\constants.h
 
-1680654961 source:c:\users\anthony altieri\documents\github\raycasting-project\playerclass.cpp
+1684714849 source:c:\users\anthony altieri\documents\github\raycasting-project\playerclass.cpp
 	"PlayerClass.h"
 	<GL/glut.h>
 	"Constants.h"
 	<cmath>
+
+1684714484 source:c:\users\anthony altieri\documents\github\raycasting-project\util.cpp
+	"Util.h"
+	<math.h>
+
+1684714460 c:\users\anthony altieri\documents\github\raycasting-project\util.h
 

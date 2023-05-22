@@ -52,6 +52,16 @@ void Player::setDeltaY(float value)
 void Player::setAngle(float value)
 {
     angle = value;
+
+    //Allows the angle to loop around the unit circle
+    if(angle < 0)
+    {
+        angle += 2*PI;
+    }
+    else if(angle > 2 * PI)
+    {
+        angle -= 2 * PI;
+    }
 }
 
 

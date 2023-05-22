@@ -45,6 +45,8 @@
 		<Unit filename="Constants.h" />
 		<Unit filename="PlayerClass.cpp" />
 		<Unit filename="PlayerClass.h" />
+		<Unit filename="Util.cpp" />
+		<Unit filename="Util.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
