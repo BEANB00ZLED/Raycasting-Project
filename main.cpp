@@ -160,15 +160,16 @@ void drawRays2D(void)
         }
         else
         {
-            rayYHori = y1;
+            rayYHori = 0;
             depthOfField = 8;
             directionY = 0;
         }
         //Finish calculating the first point of intersection
-        rayXHori = x1 +  ((rayYHori - y1) / tan(rayAngle));
+        rayXHori = x1 + ((rayYHori - y1) / tan(rayAngle));
 
         //Calculate the slope
         deltaX = ((64 * directionY) / tan(rayAngle));
+
 
         while(depthOfField < 8)
 
@@ -190,6 +191,7 @@ void drawRays2D(void)
         }
 
 
+        /*
         //Draw the shorter ray
         glColor3f(1, 0, 0);
         glLineWidth(3);
@@ -203,6 +205,14 @@ void drawRays2D(void)
         {
             glVertex2i(rayXVert, rayYVert);
         }
+        glEnd();
+        */
+
+        glColor3f(1, 0, 0);
+        glLineWidth(3);
+        glBegin(GL_LINES);
+        glVertex2i(x1, y1);
+        glVertex2i(rayXHori, rayYHori);
         glEnd();
 
         //Increment the ray angle so that the next ray can be cast
